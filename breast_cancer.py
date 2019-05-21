@@ -62,7 +62,61 @@ svc.fit(X_train, y_train)
 #evaluate the model
 y_predict = svc.predict(X_test)
 
-confusion_matrix = confusion_matrix(y_test, y_predict)
+cm = confusion_matrix(y_test, y_predict)
+#all values are 1..something wrong..need to scale data
+
+sns.heatmap(cm, annot=True)
+
+#imporving the model ----> normalization and tune svc.
+
+min_train = X_train.min()
+range_train = (X_train - min_train).max()
+X_train_scaled = (X_train-min_train)/range_train
+
+#not scaled
+sns.scatterplot(x=X_train['mean area'], y=X_train['mean smoothness'], hue=y_train)
+
+#scaled
+sns.scatterplot(x=X_train_scaled['mean area'], y=X_train_scaled['mean smoothness'], hue=y_train)
+
+
+min_test = X_test.min()
+range_test = (X_test - min_test).max()
+X_test_scaled = (X_test-min_test)/range_test
+
+svc.fit(X_train_scaled, y_train)
+
+y_predict = svc.predict(X_test_scaled)
+
+cm = confusion_matrix(y_test, y_predict)
+
+sns.heatmap(cm, annot=True)
+
+print(classification_report(y_test, y_predict))
+# accuracy = 96%
+
+
+param_grid = {'C': [0.1, 1, 10, 100], 'gamma': [1,0.1,0.01,0.001], 'kernel':['rbf']}
+
+from sklearn.model_selection import GridSearchCV
+
+grid = GridSearchCV(SVC(), param_grid, refit=True, verbose=4)
+grid.fit(X_train_scaled, y_train)
+
+
+grid.best_params_
+#c = 10, gamma=1
+
+grid_predictions = grid.predict(X_test_scaled)
+
+cm_grid = confusion_matrix(y_test, grid_predictions)
+sns.heatmap(cm_grid, annot=True)
+
+print(classification_report(y_test, grid_predictions))
+#97% accuracy
+
+
+
 
 
 
