@@ -116,7 +116,26 @@ print(classification_report(y_test, grid_predictions))
 #97% accuracy
 
 
+#neural net
 
+
+from keras.models import Sequential#sequential module to initialize ANN
+from keras.layers import Dense#Dense module to build the layers of the ANN
+
+classifer = Sequential()
+classifer.add(Dense(20, input_dim=30, kernel_initializer='uniform', activation='relu'))
+classifer.add(Dense(1, kernel_initializer='uniform', activation='sigmoid'))
+
+classifer.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+#classifer.fit(X,y, nb_epoch=110)
+classifer.fit(X_train_scaled,y_train,batch_size=2, epochs=125)
+#accuracy: 99%
+
+y_pred = classifer.predict_classes(X_test_scaled)
+cm = confusion_matrix(y_test, y_pred)
+
+print(classification_report(y_test, y_pred))
 
 
 
